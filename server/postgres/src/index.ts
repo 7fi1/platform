@@ -23,7 +23,7 @@ export { convertDoc, createTables, getDBClient, retryTxn, setDBExtraOptions, set
 
 export function createPostgreeDestroyAdapter (url: string): WorkspaceDestroyAdapter {
   return {
-    deleteWorkspace: async (ctx, workspace): Promise<void> => {
+    deleteWorkspace: async (ctx, workspaceUuid): Promise<void> => {
       const client = getDBClient(url)
       try {
         const connection = await client.getClient()
@@ -34,7 +34,7 @@ export function createPostgreeDestroyAdapter (url: string): WorkspaceDestroyAdap
             await ctx.with('delete-workspace-domain', {}, async () => {
               await retryTxn(connection, async (client) => {
                 await client.unsafe(`delete from ${domain} where "workspaceId" = $1::uuid`, [
-                  workspace.uuid ?? workspace.name
+                  workspaceUuid
                 ])
               })
             })
