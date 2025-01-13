@@ -28,10 +28,7 @@ import {
 } from '@hcengineering/core'
 import { type MigrateOperation, type ModelLogger } from '@hcengineering/model'
 import { getClient as getAccountClient } from '@hcengineering/account-client'
-import {
-  withRetryConnUntilSuccess,
-  withRetryConnUntilTimeout
-} from '@hcengineering/server-client'
+import { withRetryConnUntilSuccess, withRetryConnUntilTimeout } from '@hcengineering/server-client'
 import { generateToken } from '@hcengineering/server-token'
 import { FileModelLogger, prepareTools } from '@hcengineering/server-tool'
 import path from 'path'
@@ -116,7 +113,11 @@ export class WorkspaceWorker {
 
     while (true) {
       try {
-        await withRetryConnUntilSuccess(accountClient.workerHandshake.bind(accountClient))(this.region, this.version, this.operation)
+        await withRetryConnUntilSuccess(accountClient.workerHandshake.bind(accountClient))(
+          this.region,
+          this.version,
+          this.operation
+        )
         break
       } catch (err: any) {
         ctx.error('error', { err })
@@ -178,7 +179,11 @@ export class WorkspaceWorker {
     })
   }
 
-  private async _createWorkspace (ctx: MeasureContext, ws: WorkspaceInfoWithStatus, opt: WorkspaceOptions): Promise<void> {
+  private async _createWorkspace (
+    ctx: MeasureContext,
+    ws: WorkspaceInfoWithStatus,
+    opt: WorkspaceOptions
+  ): Promise<void> {
     const t = Date.now()
 
     const ctxModelLogger: ModelLogger = {
@@ -209,7 +214,8 @@ export class WorkspaceWorker {
         message?: string
       ): Promise<void> => {
         return withRetryConnUntilTimeout(
-          () => getAccountClient(this.accountsUrl, token).updateWorkspaceInfo(ws.uuid, event, version, progress, message),
+          () =>
+            getAccountClient(this.accountsUrl, token).updateWorkspaceInfo(ws.uuid, event, version, progress, message),
           5000
         )()
       }
@@ -259,7 +265,11 @@ export class WorkspaceWorker {
     }
   }
 
-  private async _upgradeWorkspace (ctx: MeasureContext, ws: WorkspaceInfoWithStatus, opt: WorkspaceOptions): Promise<void> {
+  private async _upgradeWorkspace (
+    ctx: MeasureContext,
+    ws: WorkspaceInfoWithStatus,
+    opt: WorkspaceOptions
+  ): Promise<void> {
     if (
       ws.isDisabled === true ||
       isArchivingMode(ws.mode) ||
@@ -298,7 +308,8 @@ export class WorkspaceWorker {
         message?: string
       ): Promise<void> => {
         return withRetryConnUntilTimeout(
-          () => getAccountClient(this.accountsUrl, token).updateWorkspaceInfo(ws.uuid, event, version, progress, message),
+          () =>
+            getAccountClient(this.accountsUrl, token).updateWorkspaceInfo(ws.uuid, event, version, progress, message),
           5000
         )()
       }
@@ -358,7 +369,13 @@ export class WorkspaceWorker {
 
     const sendEvent = (event: WorkspaceUpdateEvent, progress: number): Promise<void> =>
       withRetryConnUntilSuccess(() =>
-        getAccountClient(this.accountsUrl, token).updateWorkspaceInfo(workspace.uuid, event, this.version, progress, `${event} done`)
+        getAccountClient(this.accountsUrl, token).updateWorkspaceInfo(
+          workspace.uuid,
+          event,
+          this.version,
+          progress,
+          `${event} done`
+        )
       )()
 
     switch (workspace.mode ?? 'active') {
@@ -461,7 +478,14 @@ export class WorkspaceWorker {
       message?: string
     ): Promise<void> => {
       return withRetryConnUntilTimeout(
-        () => getAccountClient(this.accountsUrl, token).updateWorkspaceInfo(workspace.uuid, event, version, progress, message),
+        () =>
+          getAccountClient(this.accountsUrl, token).updateWorkspaceInfo(
+            workspace.uuid,
+            event,
+            version,
+            progress,
+            message
+          ),
         5000
       )()
     }
@@ -517,7 +541,11 @@ export class WorkspaceWorker {
     return false
   }
 
-  private async doRestore (ctx: MeasureContext, workspace: WorkspaceInfoWithStatus, opt: WorkspaceOptions): Promise<boolean> {
+  private async doRestore (
+    ctx: MeasureContext,
+    workspace: WorkspaceInfoWithStatus,
+    opt: WorkspaceOptions
+  ): Promise<boolean> {
     if (opt.backup === undefined) {
       return false
     }
@@ -541,7 +569,14 @@ export class WorkspaceWorker {
       message?: string
     ): Promise<void> => {
       return withRetryConnUntilTimeout(
-        () => getAccountClient(this.accountsUrl, token).updateWorkspaceInfo(workspace.uuid, event, version, progress, message),
+        () =>
+          getAccountClient(this.accountsUrl, token).updateWorkspaceInfo(
+            workspace.uuid,
+            event,
+            version,
+            progress,
+            message
+          ),
         5000
       )()
     }
