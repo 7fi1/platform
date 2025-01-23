@@ -137,7 +137,7 @@ import {
 import { restoreControlledDocContentMongo, restoreWikiContentMongo, restoreMarkupRefsMongo } from './markup'
 import { fixMixinForeignAttributes, showMixinForeignAttributes } from './mixin'
 
-import { fixAccountEmails, renameAccount, fillGithubUsers } from './account'
+// import { fixAccountEmails, renameAccount, fillGithubUsers } from './account'
 import { copyToDatalake, moveFiles, showLostFiles } from './storage'
 import { createPostgresTxAdapter, createPostgresAdapter, createPostgreeDestroyAdapter } from '@hcengineering/postgres'
 import { reindexWorkspace } from './fulltext'
