@@ -504,6 +504,7 @@ export async function selectWorkspace (
       token,
       workspace: workspace.uuid,
       workspaceUrl: workspace.url,
+      workspaceDataId: workspace.dataId,
       role: AccountRole.DocGuest
     }
   }
@@ -560,6 +561,7 @@ export async function selectWorkspace (
         token: generateToken(accountUuid, workspace.uuid),
         workspace: workspace.uuid,
         workspaceUrl: workspace.url,
+        workspaceDataId: workspace.dataId,
         role
       }
       return result
@@ -572,6 +574,7 @@ export async function selectWorkspace (
     endpoint: getEndpoint(ctx, workspace.uuid, workspace.region, getKind(workspace.region)),
     workspace: workspace.uuid,
     workspaceUrl: workspace.url,
+    workspaceDataId: workspace.dataId,
     role
   }
 }
@@ -857,6 +860,10 @@ export async function getWorkspaceInvite (db: AccountDB, id: string): Promise<Wo
   }
 
   return await db.invite.findOne({ migratedFrom: id })
+}
+
+export async function getSocialIdByKey (db: AccountDB, socialKey: string): Promise<SocialId | null> {
+  return await db.socialId.findOne({ key: socialKey })
 }
 
 export async function getEmailSocialId (db: AccountDB, email: string): Promise<SocialId | null> {

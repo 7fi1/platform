@@ -449,7 +449,7 @@ export function devTool (
 
         const coreWsInfo = flattenStatus(wsInfo)
         const measureCtx = new MeasureMetricsContext('upgrade-workspace', {})
-        const accountClient = getAccountClient(getToolToken())
+        const accountClient = getAccountClient(getToolToken(wsInfo.uuid))
 
         await upgradeWorkspace(
           measureCtx,
@@ -923,7 +923,7 @@ export function devTool (
   //     const storage = await createFileBackupStorage(dirName)
   //     const wsid = getWorkspaceId(workspace)
   //     const endpoint = await getTransactorEndpoint(generateToken(systemAccountEmail, wsid), 'external')
-  //     await backup(toolCtx, endpoint, wsid, storage, {
+  //     await backup(toolCtx, endpoint, wsIds, storage, {
   //       force: cmd.force,
   //       freshBackup: cmd.fresh,
   //       clean: cmd.clean,
@@ -1000,12 +1000,17 @@ export function devTool (
           }
 
           const workspace = ws.uuid
+          const wsIds = {
+            uuid: ws.uuid,
+            dataId: ws.dataId,
+            url: ws.url
+          }
           const storage = await createFileBackupStorage(dirName)
           const storageConfig = cmd.useStorage !== '' ? storageConfigFromEnv(process.env[cmd.useStorage]) : undefined
 
           const workspaceStorage: StorageAdapter | undefined =
             storageConfig !== undefined ? buildStorageFromConfig(storageConfig) : undefined
-          await restore(toolCtx, await getWorkspaceTransactorEndpoint(workspace), workspace, storage, {
+          await restore(toolCtx, await getWorkspaceTransactorEndpoint(workspace), wsIds, storage, {
             date: parseInt(date ?? '-1'),
             merge: cmd.merge,
             parallel: parseInt(cmd.parallel ?? '1'),
@@ -1036,7 +1041,7 @@ export function devTool (
   //     const storage = await createStorageBackupStorage(toolCtx, adapter, getWorkspaceId(bucketName), dirName)
   //     const wsid = getWorkspaceId(workspace)
   //     const endpoint = await getTransactorEndpoint(generateToken(systemAccountEmail, wsid), 'external')
-  //     await backup(toolCtx, endpoint, wsid, storage)
+  //     await backup(toolCtx, endpoint, wsIds, storage)
   //   })
   // })
 
@@ -1308,9 +1313,10 @@ export function devTool (
   //         }
 
   //         const workspaceId = getWorkspaceId(workspace.workspace)
+  //         const workspaceDataId = workspace.dataId ?? workspace.uuid
   //         const wsDb = getWorkspaceMongoDB(_client, { name: workspace.workspace })
 
-  //         await restoreWikiContentMongo(toolCtx, wsDb, workspaceId, storageAdapter, params)
+  //         await restoreWikiContentMongo(toolCtx, wsDb, workspaceDataId, storageAdapter, params)
   //       }
   //     } finally {
   //       client.close()
@@ -1362,9 +1368,10 @@ export function devTool (
   //           }
 
   //           const workspaceId = getWorkspaceId(workspace.workspace)
+  //           const workspaceDataId = workspace.dataId ?? workspace.uuid
   //           const wsDb = getWorkspaceMongoDB(_client, { name: workspace.workspace })
 
-  //           await restoreControlledDocContentMongo(toolCtx, wsDb, workspaceId, storageAdapter, params)
+  //           await restoreControlledDocContentMongo(toolCtx, wsDb, workspaceDataId, storageAdapter, params)
   //         }
   //       } finally {
   //         client.close()
@@ -1418,9 +1425,10 @@ export function devTool (
   //           }
 
   //           const workspaceId = getWorkspaceId(workspace.workspace)
+  //           const workspaceDataId = workspace.dataId ?? workspace.uuid
   //           const wsDb = getWorkspaceMongoDB(_client, { name: workspace.workspace })
 
-  //           await restoreMarkupRefsMongo(toolCtx, wsDb, workspaceId, hierarchy, storageAdapter)
+  //           await restoreMarkupRefsMongo(toolCtx, wsDb, workspaceDataId, hierarchy, storageAdapter)
   //         }
   //       } finally {
   //         client.close()
